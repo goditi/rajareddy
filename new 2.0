@@ -1,0 +1,55 @@
+Import-Module webadministration
+
+if(test-path IIs:\AppPools\Devops)
+{
+    #If above condition is true then this block statement wiil be execute
+    Write-Warning "The following Application pool Already exist"
+    #Remove-webAppPool
+   Remove-Item IIS:\Apppools\Devops -Force -Recurse -Verbose
+   #create new-App pool
+   New-WebAppPool -Name "krishna" -Force -verbose
+
+   }
+   else{
+       #If above if condition failed then this else block statements will execute
+       write-Host "The following Application pool does not exist. Hence creating new" -foregroundColour Red
+       #Create App-Pool by using New-webApppool cmdlet
+       New-WebAppPool -Name krishna -Verbose -Force
+       }
+	   
+	   
+	   
+	   param(
+[parameter (mandatory=$true)]
+      [string]$pool
+
+ )
+Import-Module webadministration
+
+if(test-path IIs:\AppPools\$pool)
+{
+    #If above condition is true then this block statement will be execute
+    Write-Warning "The following Application pool:$pool Already exist"
+    #Remove-webAppPool
+   Remove-Item IIS:\Apppools\$pool -Force -Recurse -Verbose
+   #create new-App pool
+   New-WebAppPool -Name $pool -Force -verbose
+
+   #fetch the application pool using get-item and store the value into variable$result
+   $result=Get-Item IIS:\AppPools\$pool -Force -verbose
+   #modify queuelength = 7000
+   $result.queueLength=7000
+   #managed run time version v2.0
+   $result.managedruntimeversion="v2.0"
+   #mange pipeline mode as classic
+   $result.managedpipelineMode="classic"
+   #set the above new values to existing app-pool
+   $result |Set-Item -Force -vrbose
+   }
+   else
+   {
+       #If above if condition failed then this else block statements will execute
+       write-Host "The following Application pool does not exist. Hence creating new" -foregroundColour Red
+       #Create App-Pool by using New-webApppool cmdlet
+       New-WebAppPool -Name $pool -Verbose -Force
+       }
